@@ -1,10 +1,13 @@
 package com.devpulse.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.*;
-import java.util.*;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -20,18 +23,20 @@ public class GitHubService {
             headers.set("User-Agent", "DevPulse-AI");
 
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<List> response = restTemplate.exchange(
-                url, HttpMethod.GET, entity, List.class
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                url, HttpMethod.GET, entity,
+                new ParameterizedTypeReference<List<Map<String, Object>>>() {}
             );
 
             if (response.getBody() == null) return "No commits found";
 
             StringBuilder commits = new StringBuilder();
-            List<Map<String, Object>> commitList = (List<Map<String, Object>>) response.getBody();
-            for (Map<String, Object> item : commitList) {
-                Map<String, Object> commit = (Map<String, Object>) item.get("commit");
-                String message = commit.get("message").toString().split("\n")[0];
-                commits.append("- ").append(message).append("\n");
+            for (Map<String, Object> item : response.getBody()) {
+                Map<?, ?> commit = (Map<?, ?>) item.get("commit");
+                if (commit != null) {
+                    String message = commit.get("message").toString().split("\n")[0];
+                    commits.append("- ").append(message).append("\n");
+                }
             }
             return commits.toString();
         } catch (Exception e) {
@@ -48,15 +53,15 @@ public class GitHubService {
             headers.set("User-Agent", "DevPulse-AI");
 
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<List> response = restTemplate.exchange(
-                url, HttpMethod.GET, entity, List.class
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                url, HttpMethod.GET, entity,
+                new ParameterizedTypeReference<List<Map<String, Object>>>() {}
             );
 
             if (response.getBody() == null) return "No open issues";
 
             StringBuilder issues = new StringBuilder();
-            List<Map<String, Object>> issueList = (List<Map<String, Object>>) response.getBody();
-            for (Map<String, Object> issue : issueList) {
+            for (Map<String, Object> issue : response.getBody()) {
                 String title = issue.get("title").toString();
                 issues.append("- ").append(title).append("\n");
             }
@@ -68,7 +73,6 @@ public class GitHubService {
     }
 
     public String[] parseRepoUrl(String repoUrl) {
-        // Handle formats: github.com/owner/repo or owner/repo
         repoUrl = repoUrl.replace("https://", "").replace("http://", "")
                         .replace("github.com/", "").trim();
         String[] parts = repoUrl.split("/");
