@@ -56,13 +56,21 @@ No manual input needed — just a repo URL.
 ### Run in mock mode (no API key needed)
 
 ```bash
+# Windows (PowerShell)
 $env:GEMINI_API_KEY="dummy"; mvn spring-boot:run
+
+# Mac/Linux
+GEMINI_API_KEY=dummy mvn spring-boot:run
 ```
 
 ### Run with real Gemini AI
 
 ```bash
+# Windows (PowerShell)
 $env:GEMINI_API_KEY="your_real_key_here"; mvn spring-boot:run
+
+# Mac/Linux
+GEMINI_API_KEY=your_real_key_here mvn spring-boot:run
 ```
 
 Visit: http://localhost:8080/swagger-ui.html
