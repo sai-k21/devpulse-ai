@@ -126,5 +126,4 @@ Client Request (repo URL)
 
 **Sai Kumar Moguluri**
 
-- LinkedIn: https://linkedin.com/in/sai-1899k
 - GitHub: https://github.com/sai-k21
